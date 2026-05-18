@@ -1,13 +1,13 @@
 import express from "express";
 import axios from "axios";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import OpenAI from "openai";
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 
 // SaaS Backend host
-const SAAS_HOST = "http://aibigtree.com";
+const SAAS_HOST = "https://aibigtree.com";
 
 // Helper to convert frontend schema type to Gemini SDK requirements
 const processSchema = (s: any): any => {
@@ -37,12 +37,19 @@ const proxyToSaaS = async (req: express.Request, res: express.Response, targetPa
       params: req.query,
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       }
     });
     res.status(response.status).json(response.data);
   } catch (error: any) {
-    console.error(`SaaS Proxy Error (${targetPath}):`, error.response?.data || error.message);
-    res.status(error.response?.status || 500).json(error.response?.data || { error: "SaaS 代理请求失败" });
+    const errorData = error.response?.data;
+    const errorMessage = typeof errorData === 'string' ? errorData : (errorData?.message || errorData?.error || error.message);
+    console.error(`SaaS Proxy Error (${targetPath}):`, errorData || error.message);
+    res.status(error.response?.status || 500).json({ 
+      success: false, 
+      error: errorMessage,
+      details: errorData 
+    });
   }
 };
 
@@ -108,7 +115,7 @@ app.post("/api/gemini", async (req, res) => {
       return res.status(400).json({ error: "服务器未配置 GEMINI_API_KEY。" });
     }
 
-    const genAI = new (GoogleGenAI as any)(apiKey);
+    const genAI = new GoogleGenerativeAI(apiKey);
     const geminiModel = genAI.getGenerativeModel({ 
       model: model || "gemini-1.5-flash",
       systemInstruction: systemInstruction 
