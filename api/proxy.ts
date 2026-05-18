@@ -108,8 +108,8 @@ app.post("/api/gemini", async (req, res) => {
       return res.status(400).json({ error: "服务器未配置 GEMINI_API_KEY。" });
     }
 
-    const genAI = new GoogleGenAI({ apiKey });
-    const geminiModel = (genAI as any).getGenerativeModel({ 
+    const genAI = new (GoogleGenAI as any)(apiKey);
+    const geminiModel = genAI.getGenerativeModel({ 
       model: model || "gemini-1.5-flash",
       systemInstruction: systemInstruction 
     });

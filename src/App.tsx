@@ -131,8 +131,12 @@ export default function App() {
   const durationOptions: CopywritingConfig['duration'][] = ['15-30s', '30-60s', '1-3min'];
 
   const handleImageUpload = async (file: File) => {
-    if (!saas.userId) return;
+    if (!saas.userId) {
+      setError('未检测到用户身份，请通过平台访问以免无法保存图片');
+      return;
+    }
     setUploading(true);
+    setError(null);
     try {
       // 1. Get direct upload token
       const tokenRes = await fetch('/api/upload/direct-token', {
@@ -168,6 +172,10 @@ export default function App() {
   const handleGenerate = async () => {
     if (!config.mainTitle.trim()) {
       setError('请输入主要标题内容');
+      return;
+    }
+    if (!saas.userId) {
+      setError('未检测到用户身份，请通过平台访问');
       return;
     }
     setError(null);
