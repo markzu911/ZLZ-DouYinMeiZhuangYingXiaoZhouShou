@@ -6,6 +6,7 @@ export interface CopywritingConfig {
   contentStyle: string;
   duration: '15-30s' | '30-60s' | '1-3min';
   referenceImageUrl?: string;
+  referenceImageBase64?: string;
 }
 
 export interface CopywritingResult {

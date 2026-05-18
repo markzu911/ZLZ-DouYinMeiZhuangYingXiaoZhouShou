@@ -101,6 +101,7 @@ async function handleGemini(req: any, res: any) {
     prompt,
     systemInstruction,
     responseSchema,
+    image, // base64 image
     model = process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   } = body;
 
@@ -128,13 +129,27 @@ async function handleGemini(req: any, res: any) {
       generationConfig.responseSchema = processSchema(responseSchema);
     }
 
+    const contents: any[] = [
+      {
+        role: 'user',
+        parts: [{ text: prompt }],
+      },
+    ];
+
+    if (image && typeof image === 'string') {
+      const match = image.match(/^data:([^;]+);base64,(.+)$/);
+      if (match) {
+        contents[0].parts.push({
+          inlineData: {
+            mimeType: match[1],
+            data: match[2],
+          },
+        });
+      }
+    }
+
     const result = await geminiModel.generateContent({
-      contents: [
-        {
-          role: 'user',
-          parts: [{ text: prompt }],
-        },
-      ],
+      contents,
       generationConfig,
     });
 

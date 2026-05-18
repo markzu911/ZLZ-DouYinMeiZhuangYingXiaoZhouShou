@@ -59,6 +59,7 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
           // Do not hardcode model here, let backend use its environment variable
           prompt,
           systemInstruction,
+          image: config.referenceImageBase64, // Pass base64 image
           responseSchema: {
             type: "object",
             properties: {

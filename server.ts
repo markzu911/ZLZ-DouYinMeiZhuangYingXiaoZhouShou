@@ -41,10 +41,30 @@ async function startServer() {
     if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY missing" });
 
     try {
-      const { prompt, systemInstruction, model = process.env.GEMINI_MODEL || 'gemini-2.5-flash' } = req.body;
+      const { prompt, systemInstruction, image, model = process.env.GEMINI_MODEL || 'gemini-2.5-flash' } = req.body;
       const genAI = new GoogleGenerativeAI(apiKey);
       const geminiModel = genAI.getGenerativeModel({ model, systemInstruction });
-      const result = await geminiModel.generateContent(prompt);
+      
+      const contents: any[] = [
+        {
+          role: 'user',
+          parts: [{ text: prompt }],
+        },
+      ];
+
+      if (image && typeof image === 'string') {
+        const match = image.match(/^data:([^;]+);base64,(.+)$/);
+        if (match) {
+          contents[0].parts.push({
+            inlineData: {
+              mimeType: match[1],
+              data: match[2],
+            },
+          });
+        }
+      }
+
+      const result = await geminiModel.generateContent({ contents });
       const response = await result.response;
       res.json({ success: true, text: response.text() });
     } catch (error: any) {

@@ -131,39 +131,27 @@ export default function App() {
   const durationOptions: CopywritingConfig['duration'][] = ['15-30s', '30-60s', '1-3min'];
 
   const handleImageUpload = async (file: File) => {
-    if (!saas.userId) {
-      setError('未检测到用户身份，请通过平台访问以免无法保存图片');
-      return;
-    }
     setUploading(true);
     setError(null);
     try {
-      // 1. Get direct upload token
-      const tokenRes = await fetch('/api/upload/direct-token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: saas.userId,
-          source: 'input',
-          fileName: file.name,
-          mimeType: file.type || 'image/png',
-          fileSize: file.size
-        })
+      const previewUrl = URL.createObjectURL(file);
+      
+      // Convert to base64 for Gemini
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
       });
-      const tokenJson = await tokenRes.json();
-      if (!tokenJson.success) throw new Error(tokenJson.message || '获取上传凭证失败');
+      reader.readAsDataURL(file);
+      const base64 = await base64Promise;
 
-      // 2. PUT to OSS
-      await fetch(tokenJson.uploadUrl, {
-        method: tokenJson.method,
-        headers: tokenJson.headers,
-        body: file
-      });
-
-      // 3. Set reference URL
-      setConfig(prev => ({ ...prev, referenceImageUrl: tokenJson.url }));
+      setConfig(prev => ({
+        ...prev,
+        referenceImageUrl: previewUrl,
+        referenceImageBase64: base64
+      }));
     } catch (err: any) {
-      setError(err.message || '图片上传失败');
+      setError(err.message || '图片读取失败');
     } finally {
       setUploading(false);
     }
@@ -220,10 +208,29 @@ export default function App() {
     }
   };
 
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(label);
-    setTimeout(() => setCopied(null), 2000);
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      if (navigator.clipboard?.writeText && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
+
+      setCopied(label);
+      setTimeout(() => setCopied(null), 2000);
+    } catch (err) {
+      console.error('Copy failed:', err);
+      setError('复制失败，请手动选择文本复制');
+    }
   };
 
   return (
