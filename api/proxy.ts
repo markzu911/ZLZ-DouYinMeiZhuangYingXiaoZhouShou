@@ -29,26 +29,34 @@ const processSchema = (s: any): any => {
 
 // Helper for proxying requests to SaaS backend
 const proxyToSaaS = async (req: express.Request, res: express.Response, targetPath: string) => {
+  const url = `${SAAS_HOST}${targetPath}`;
+  console.log(`Proxying ${req.method} to SaaS: ${url}`);
+  
   try {
     const response = await axios({
       method: req.method,
-      url: `${SAAS_HOST}${targetPath}`,
+      url: url,
       data: req.body,
       params: req.query,
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-      }
+      },
+      timeout: 30000 // 30s timeout
     });
     res.status(response.status).json(response.data);
   } catch (error: any) {
     const errorData = error.response?.data;
-    const errorMessage = typeof errorData === 'string' ? errorData : (errorData?.message || errorData?.error || error.message);
-    console.error(`SaaS Proxy Error (${targetPath}):`, errorData || error.message);
-    res.status(error.response?.status || 500).json({ 
+    const status = error.response?.status || 500;
+    
+    console.error(`SaaS Proxy Error [${status}] (${targetPath}):`, errorData || error.message);
+    
+    // Return structured error
+    res.status(status).json({ 
       success: false, 
-      error: errorMessage,
-      details: errorData 
+      error: typeof errorData === 'string' ? errorData : (errorData?.message || errorData?.error || "SaaS 代理请求失败"),
+      detail: errorData,
+      path: targetPath
     });
   }
 };
@@ -107,17 +115,23 @@ app.post("/api/generate-gpt", async (req, res) => {
 
 // Gemini Proxy Route
 app.post("/api/gemini", async (req, res) => {
+  let requestedModel = req.body.model || process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  
   try {
-    const { model, prompt, systemInstruction, responseSchema } = req.body;
+    const { prompt, systemInstruction, responseSchema } = req.body;
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      return res.status(400).json({ error: "服务器未配置 GEMINI_API_KEY。" });
+      return res.status(400).json({ 
+        success: false, 
+        error: "Server configuration missing", 
+        detail: "服务器未配置 GEMINI_API_KEY。" 
+      });
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
     const geminiModel = genAI.getGenerativeModel({ 
-      model: model || "gemini-1.5-flash",
+      model: requestedModel,
       systemInstruction: systemInstruction 
     });
 
@@ -136,10 +150,26 @@ app.post("/api/gemini", async (req, res) => {
     });
 
     const response = await result.response;
-    res.json({ text: response.text() });
+    res.json({ success: true, text: response.text() });
   } catch (error: any) {
-    console.error("Gemini Error:", error);
-    res.status(500).json({ error: error.message || "Gemini 生成失败" });
+    console.error("Gemini Proxy Error:", error);
+    
+    // Check if it's a model not found error
+    const isNotFound = error.message?.includes('not found') || error.status === 404 || error.response?.status === 404;
+
+    if (isNotFound) {
+      return res.status(404).json({
+        success: false,
+        error: "Gemini model is unavailable",
+        detail: `当前模型 ${requestedModel} 不可用，请检查 GEMINI_MODEL 配置或尝试其他模型。`
+      });
+    }
+
+    res.status(500).json({ 
+      success: false, 
+      error: "Gemini generation failed", 
+      detail: error.message || "Unknown error during Gemini generation" 
+    });
   }
 });
 

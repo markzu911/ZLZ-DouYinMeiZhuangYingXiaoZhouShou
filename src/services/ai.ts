@@ -56,7 +56,7 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: 'gemini-1.5-flash',
+          // Do not hardcode model here, let backend use its environment variable
           prompt,
           systemInstruction,
           responseSchema: {
