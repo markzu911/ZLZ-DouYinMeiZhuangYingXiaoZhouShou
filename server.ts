@@ -4,6 +4,7 @@ import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
 import axios from "axios";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import OpenAI from "openai";
 
 dotenv.config();
 
@@ -67,6 +68,29 @@ async function startServer() {
       const result = await geminiModel.generateContent({ contents });
       const response = await result.response;
       res.json({ success: true, text: response.text() });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/generate-gpt", async (req, res) => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "OPENAI_API_KEY missing" });
+
+    try {
+      const { prompt, systemInstruction, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = req.body;
+      const openai = new OpenAI({ apiKey });
+
+      const completion = await openai.chat.completions.create({
+        model,
+        messages: [
+          systemInstruction ? { role: 'system', content: systemInstruction } : null,
+          { role: 'user', content: prompt },
+        ].filter(Boolean) as any[],
+      });
+
+      const text = completion.choices?.[0]?.message?.content || '';
+      res.json({ success: true, text });
     } catch (error: any) {
       res.status(500).json({ error: error.message });
     }

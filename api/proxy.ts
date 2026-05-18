@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
 const SAAS_ORIGIN = 'http://aibigtree.com';
 
@@ -169,6 +170,53 @@ async function handleGemini(req: any, res: any) {
   }
 }
 
+async function handleGenerateGpt(req: any, res: any) {
+  const apiKey = process.env.OPENAI_API_KEY;
+
+  if (!apiKey) {
+    return res.status(500).json({
+      success: false,
+      error: 'Missing OPENAI_API_KEY on server',
+    });
+  }
+
+  const body = normalizeBody(req.body);
+  const { prompt, systemInstruction, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = body;
+
+  if (!prompt) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing prompt',
+    });
+  }
+
+  try {
+    const openai = new OpenAI({ apiKey });
+
+    const completion = await openai.chat.completions.create({
+      model,
+      messages: [
+        systemInstruction ? { role: 'system', content: systemInstruction } : null,
+        { role: 'user', content: prompt },
+      ].filter(Boolean) as any[],
+    });
+
+    const text = completion.choices?.[0]?.message?.content || '';
+
+    return res.status(200).json({
+      success: true,
+      text,
+    });
+  } catch (error: any) {
+    console.error('GPT Error:', error);
+    return res.status(500).json({
+      success: false,
+      error: 'GPT generation failed',
+      detail: error?.message || String(error),
+    });
+  }
+}
+
 export default async function handler(req: any, res: any) {
   setCors(res);
 
@@ -182,6 +230,11 @@ export default async function handler(req: any, res: any) {
     if (apiPath === '/api/gemini') {
       if (req.method !== 'POST') return res.status(405).end();
       return await handleGemini(req, res);
+    }
+
+    if (apiPath === '/api/generate-gpt') {
+      if (req.method !== 'POST') return res.status(405).end();
+      return await handleGenerateGpt(req, res);
     }
 
     if (TOOL_ENDPOINTS.has(apiPath)) {
