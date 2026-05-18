@@ -1,12 +1,56 @@
+import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import app from "./api/proxy";
 import dotenv from "dotenv";
+import axios from "axios";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
+const SAAS_ORIGIN = 'http://aibigtree.com';
+
 async function startServer() {
+  const app = express();
   const PORT = 3000;
+
+  app.use(express.json({ limit: '50mb' }));
+
+  // SaaS Proxy logic for local dev
+  const proxyToSaaS = async (req: express.Request, res: express.Response, targetPath: string) => {
+    try {
+      const response = await axios({
+        method: req.method,
+        url: `${SAAS_ORIGIN}${targetPath}`,
+        data: req.body,
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        }
+      });
+      res.status(response.status).json(response.data);
+    } catch (error: any) {
+      res.status(error.response?.status || 500).json(error.response?.data || { error: "SaaS Proxy Failed" });
+    }
+  };
+
+  app.all("/api/tool/*", (req, res) => proxyToSaaS(req, res, req.path));
+  app.all("/api/upload/*", (req, res) => proxyToSaaS(req, res, req.path));
+
+  app.post("/api/gemini", async (req, res) => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY missing" });
+
+    try {
+      const { prompt, systemInstruction, model = process.env.GEMINI_MODEL || 'gemini-2.0-flash' } = req.body;
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const geminiModel = genAI.getGenerativeModel({ model, systemInstruction });
+      const result = await geminiModel.generateContent(prompt);
+      const response = await result.response;
+      res.json({ success: true, text: response.text() });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
@@ -17,7 +61,7 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(expressStatic(distPath));
+    app.use(express.static(distPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
@@ -26,12 +70,6 @@ async function startServer() {
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Development server running on http://0.0.0.0:${PORT}`);
   });
-}
-
-// Minimal static middleware helper for production fallback in server.ts
-function expressStatic(path: string) {
-  const express = require('express');
-  return express.static(path);
 }
 
 startServer();
