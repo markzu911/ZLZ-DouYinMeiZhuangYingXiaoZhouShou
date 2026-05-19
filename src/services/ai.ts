@@ -3,16 +3,16 @@ import { CopywritingConfig, CopywritingResult } from "../types";
 export const generateDouyinCopy = async (config: CopywritingConfig): Promise<CopywritingResult> => {
   const { mainTitle, highlights, details, contentStyle, duration, model } = config;
 
-  const systemInstruction = `你是一位顶级的抖音美妆带货营销专家。请严格按照 JSON 格式输出脚本。
+  const systemInstruction = `你是一位顶级的短视频爆款内容专家。请严格按照 JSON 格式输出脚本。
 不要截断，必须确保输出是一个完整的、格式正确的 JSON 对象。
 
 【脚本结构要求】：
 映射到以下键名：
-1. opening (场景/痛点)：描述具体的痛点场景（如：熬大夜脸蜡黄等）。
-2. hook (产品体验/情绪共鸣)：描述使用感受。
+1. opening (场景/痛点)：描述具体的痛点场景或吸引人的开场。
+2. hook (深度关联/情绪共鸣)：描述核心价值点或引发观众共鸣。
 注意：opening + hook 总字数必须在 50 字以内。
-3. body (正文)：详实丰富，自然融入【核心卖点标签】。
-4. outro (结尾引导)：包含明确的互动引导（如“快来评论区”、“关注我”）。
+3. body (正文)：详实丰富，自然融入【核心卖点标签】。如果是长视频，增加逻辑层级和情节起伏。
+4. outro (结尾引导)：包含明确的互动引导（如“快来评论区讨论”、“点赞关注不迷路”）。
 
 【风格与要求】：
 - 视角：第一人称“我”。

@@ -41,7 +41,7 @@ export default function App() {
   const [copied, setCopied] = useState<string | null>(null);
   const [config, setConfig] = useState<CopywritingConfig>({
     mainTitle: '',
-    highlights: ['成分党'],
+    highlights: ['强烈推荐'],
     details: '',
     model: 'gemini',
     contentStyle: '情绪共鸣风格',
@@ -126,7 +126,7 @@ export default function App() {
     }
   };
 
-  const highlightOptions = ['成分党', '高性价比', '贵妇级', '懒人必备', '敏感肌友好', '纯素养肤'];
+  const highlightOptions = ['解决痛点', '性价比高', '强烈推荐', '干货分享', '生活方式', '高颜值', '必入单品', '新手友好'];
   const styleOptions = ['情绪共鸣风格', '干货科普风格', '反转风格', '真实种草风格', '数据背书风格', '轻松俏皮风格'];
   const durationOptions: CopywritingConfig['duration'][] = ['15-30s', '30-60s', '1-3min'];
 
@@ -238,17 +238,17 @@ export default function App() {
       {/* Top Navigation */}
       <nav className="bg-white border-b border-gray-100 px-6 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div className="flex items-center gap-2">
-          <div className="bg-[#FE2C55] p-1.5 rounded-lg shadow-lg shadow-[#FE2C55]/20">
+          <div className="bg-[#1a1a1a] p-1.5 rounded-lg shadow-lg shadow-black/10">
             <Sparkles className="text-white fill-white" size={20} />
           </div>
-          <h1 className="font-bold text-xl tracking-tight">Douyin <span className="text-[#FE2C55]">美妆营销专家</span></h1>
+          <h1 className="font-bold text-xl tracking-tight">Douyin <span className="text-[#1a1a1a]">爆款文案助手</span></h1>
         </div>
         <div className="flex items-center gap-6">
           {saas.launchLoaded && (
             <div className="flex flex-col items-end">
               <div className="text-[10px] text-gray-400 uppercase font-bold tracking-wider">当前剩余积分</div>
-              <div className="text-sm font-bold text-[#FE2C55] flex items-center gap-1">
-                <Zap size={14} className="fill-[#FE2C55]" />
+              <div className="text-sm font-bold text-[#1a1a1a] flex items-center gap-1">
+                <Zap size={14} className="fill-[#1a1a1a]" />
                 {saas.integral}
               </div>
             </div>
@@ -268,25 +268,25 @@ export default function App() {
           {/* Column 1: Step 1 - Core Info */}
           <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-100 p-6 shadow-xl shadow-gray-200/50 space-y-6">
             <div className="flex items-center gap-3">
-              <div className="w-7 h-7 rounded-full bg-[#FE2C55] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-[#FE2C55]/30">1</div>
-              <h2 className="font-bold text-lg">产品核心配置</h2>
+              <div className="w-7 h-7 rounded-full bg-[#1a1a1a] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-black/30">1</div>
+              <h2 className="font-bold text-lg">视频核心配置</h2>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-gray-500 mb-2">产品参考图片 (可选)</label>
+                <label className="block text-sm font-bold text-gray-500 mb-2">内容 / 产品参考图 (可选)</label>
                 <div className="grid grid-cols-1 gap-4">
                   {!config.referenceImageUrl ? (
                     <div 
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-gray-100 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-[#f8fbff] hover:bg-blue-50/50 hover:border-[#FE2C55]/20 cursor-pointer transition-all group"
+                      className="border-2 border-dashed border-gray-100 rounded-2xl p-8 flex flex-col items-center justify-center gap-3 bg-[#f8fbff] hover:bg-black/5 hover:border-black/20 cursor-pointer transition-all group"
                     >
-                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-[#FE2C55] transition-colors">
+                      <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-gray-400 group-hover:text-black transition-colors">
                         {uploading ? <RefreshCcw className="animate-spin" /> : <Camera size={24} />}
                       </div>
                       <div className="text-center">
-                        <p className="text-xs font-bold text-gray-500">{uploading ? '上传中...' : '点击或拖拽上传产品图'}</p>
-                        <p className="text-[10px] text-gray-400 mt-1">AI 将根据图片进行深度视觉分析</p>
+                        <p className="text-xs font-bold text-gray-500">{uploading ? '上传中...' : '点击或拖拽上传参考图'}</p>
+                        <p className="text-[10px] text-gray-400 mt-1">AI 将根据图片进行视觉深度分析</p>
                       </div>
                     </div>
                   ) : (
@@ -306,7 +306,7 @@ export default function App() {
                         </button>
                         <button 
                           onClick={() => setConfig({...config, referenceImageUrl: ''})}
-                          className="bg-[#FE2C55] text-white p-2 rounded-full shadow-lg"
+                          className="bg-black text-white p-2 rounded-full shadow-lg"
                         >
                           <X size={16} />
                         </button>
@@ -327,13 +327,13 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-500 mb-2">主要标题 / 产品名称</label>
+                <label className="block text-sm font-bold text-gray-500 mb-2">主要标题 / 视频主题</label>
                 <input 
                   type="text"
                   value={config.mainTitle}
                   onChange={(e) => setConfig({...config, mainTitle: e.target.value})}
-                  placeholder="例如：30天皮肤逆袭的秘密武器..."
-                  className="w-full bg-[#f8fbff] border border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#FE2C55]/20 focus:border-[#FE2C55]/40 transition-all font-medium"
+                  placeholder="例如：自律改变生活 / 探店大揭秘 / 高效学习法..."
+                  className="w-full bg-[#f8fbff] border border-gray-100 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-black/10 focus:border-black/40 transition-all font-medium"
                 />
               </div>
 
@@ -346,7 +346,7 @@ export default function App() {
                       onClick={() => setConfig({...config, duration: d})}
                       className={`py-2.5 rounded-lg text-[11px] font-bold transition-all ${
                         config.duration === d 
-                        ? 'bg-[#FE2C55] text-white' 
+                        ? 'bg-[#1a1a1a] text-white' 
                         : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                       }`}
                     >
@@ -365,7 +365,7 @@ export default function App() {
                       onClick={() => setConfig({...config, contentStyle: s})}
                       className={`py-2.5 rounded-lg text-[11px] font-bold transition-all ${
                         config.contentStyle === s 
-                        ? 'bg-[#FE2C55] text-white shadow-lg shadow-[#FE2C55]/30' 
+                        ? 'bg-[#1a1a1a] text-white shadow-lg shadow-black/30' 
                         : 'bg-gray-100 text-[#1a1a1a] hover:bg-gray-200'
                       }`}
                     >
@@ -376,12 +376,12 @@ export default function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-500 mb-2">视频详情具体细节 (可选)</label>
+                <label className="block text-sm font-bold text-gray-500 mb-2">详细描述 / 卖点细节 (可选)</label>
                 <textarea 
                   value={config.details}
                   onChange={(e) => setConfig({...config, details: e.target.value})}
-                  placeholder="请输入您的具体使用感受，或者想在文案中特别强调的细节..."
-                  className="w-full bg-[#f8fbff] border border-gray-100 rounded-xl px-4 py-3 h-40 resize-none focus:outline-none focus:ring-2 focus:ring-[#FE2C55]/20 transition-all text-sm leading-relaxed"
+                  placeholder="详细描述视频内容、产品卖点或想表达的具体细节..."
+                  className="w-full bg-[#f8fbff] border border-gray-100 rounded-xl px-4 py-3 h-40 resize-none focus:outline-none focus:ring-2 focus:ring-black/10 transition-all text-sm leading-relaxed"
                 />
               </div>
             </div>
@@ -391,8 +391,8 @@ export default function App() {
           <div className="lg:col-span-4 flex flex-col gap-6">
             <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-xl shadow-gray-200/50 space-y-6 flex-1">
               <div className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full bg-[#FE2C55] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-[#FE2C55]/30">2</div>
-                <h2 className="font-bold text-lg">分类与引擎配置</h2>
+                <div className="w-7 h-7 rounded-full bg-[#1a1a1a] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-black/30">2</div>
+                <h2 className="font-bold text-lg">创作引擎配置</h2>
               </div>
 
               <div className="space-y-6">
@@ -402,19 +402,19 @@ export default function App() {
                     <button 
                       onClick={() => setConfig({...config, model: 'gemini'})}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                        config.model === 'gemini' ? 'border-[#FE2C55] bg-[#FE2C55]/5' : 'border-gray-50 bg-gray-50 hover:border-gray-200'
+                        config.model === 'gemini' ? 'border-black bg-black/5' : 'border-gray-50 bg-gray-50 hover:border-gray-200'
                       }`}
                     >
-                      <Sparkles size={20} className={config.model === 'gemini' ? 'text-[#FE2C55]' : 'text-gray-400'} />
+                      <Sparkles size={20} className={config.model === 'gemini' ? 'text-black' : 'text-gray-400'} />
                       <span className="text-[11px] font-bold text-center">Gemini 3.1<br/><span className="text-[9px] opacity-60">极速版</span></span>
                     </button>
                     <button 
                       onClick={() => setConfig({...config, model: 'gpt'})}
                       className={`flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all ${
-                        config.model === 'gpt' ? 'border-[#FE2C55] bg-[#FE2C55]/5' : 'border-gray-50 bg-gray-50 hover:border-gray-200'
+                        config.model === 'gpt' ? 'border-black bg-black/5' : 'border-gray-50 bg-gray-50 hover:border-gray-200'
                       }`}
                     >
-                      <Cpu size={20} className={config.model === 'gpt' ? 'text-[#FE2C55]' : 'text-gray-400'} />
+                      <Cpu size={20} className={config.model === 'gpt' ? 'text-black' : 'text-gray-400'} />
                       <span className="text-[11px] font-bold text-center">OpenAI GPT-4o<br/><span className="text-[9px] opacity-60">深度级 (需Key)</span></span>
                     </button>
                   </div>
@@ -432,7 +432,7 @@ export default function App() {
                         onClick={() => toggleHighlight(e)}
                         className={`px-3 py-1.5 rounded-lg text-xs border font-bold transition-all ${
                           config.highlights.includes(e)
-                          ? 'border-[#FE2C55] text-[#FE2C55] bg-[#FE2C55]/5'
+                          ? 'border-black text-black bg-black/5'
                           : 'border-gray-100 bg-[#f8fbff] text-gray-500'
                         }`}
                       >
@@ -464,7 +464,7 @@ export default function App() {
           {/* Column 3: Preview */}
           <div className="lg:col-span-4 bg-white rounded-2xl border border-gray-100 p-6 shadow-xl shadow-gray-200/50 min-h-[600px] flex flex-col relative overflow-hidden">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-7 h-7 rounded-full bg-[#FE2C55] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-[#FE2C55]/30">3</div>
+              <div className="w-7 h-7 rounded-full bg-[#1a1a1a] text-white flex items-center justify-center text-sm font-bold shadow-md shadow-black/30">3</div>
               <h2 className="font-bold text-lg italic">预览爆款脚本</h2>
             </div>
             
@@ -485,8 +485,8 @@ export default function App() {
                   animate={{ opacity: 1 }}
                   className="flex-1 flex flex-col items-center justify-center gap-4 py-20"
                 >
-                  <div className="w-12 h-12 border-4 border-gray-100 border-t-[#FE2C55] rounded-full animate-spin" />
-                  <p className="text-sm font-bold text-[#FE2C55] animate-pulse">正在捕捉流量密码...</p>
+                  <div className="w-12 h-12 border-4 border-gray-100 border-t-black rounded-full animate-spin" />
+                  <p className="text-sm font-bold text-black animate-pulse">正在捕捉流量密码...</p>
                 </motion.div>
               )}
 
@@ -497,7 +497,7 @@ export default function App() {
                   className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar"
                 >
                   <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-[#FE2C55] uppercase tracking-wider">爆款标题建议</h3>
+                    <h3 className="text-xs font-bold text-black uppercase tracking-wider">爆款标题建议</h3>
                     <div className="space-y-2">
                       {result.titles.map((t, i) => (
                         <div 
@@ -507,7 +507,7 @@ export default function App() {
                         >
                           {t}
                           <button className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 p-1 rounded bg-white/80 shadow-sm transition-all">
-                            <Copy size={14} className="text-gray-400 hover:text-[#FE2C55]" />
+                            <Copy size={14} className="text-gray-400 hover:text-black" />
                           </button>
                         </div>
                       ))}
@@ -515,15 +515,15 @@ export default function App() {
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-[#FE2C55] uppercase tracking-wider">美妆博主脚本</h3>
-                    <div className="bg-[#fdf9f9] p-4 rounded-2xl border border-red-50/50 space-y-4 shadow-inner">
-                      <div className="text-sm font-bold text-gray-800 pb-2 border-b border-red-100/30 line-clamp-1">📜 脚本拆解</div>
+                    <h3 className="text-xs font-bold text-black uppercase tracking-wider">爆款内容脚本</h3>
+                    <div className="bg-[#f9f9f9] p-4 rounded-2xl border border-gray-100 space-y-4 shadow-inner">
+                      <div className="text-sm font-bold text-gray-800 pb-2 border-b border-gray-100 line-clamp-1">📜 脚本拆解</div>
                       <div className="space-y-4 text-sm leading-relaxed text-gray-700">
                         <div 
                           onClick={() => copyToClipboard(`${result.sections.opening} ${result.sections.hook}`, '开头钩子')}
-                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-[#FE2C55]/30 hover:bg-white transition-all group relative"
+                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-black/30 hover:bg-white transition-all group relative"
                         >
-                          <p><span className="font-bold text-[#FE2C55] mr-2">【视频开头钩子】</span></p>
+                          <p><span className="font-bold text-black mr-2">【视频开头】</span></p>
                           <p className="mt-1">{result.sections.opening} {result.sections.hook}</p>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Copy size={12} className="text-gray-400" />
@@ -531,9 +531,9 @@ export default function App() {
                         </div>
                         <div 
                           onClick={() => copyToClipboard(result.sections.body, '正文')}
-                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-[#FE2C55]/30 hover:bg-white transition-all group relative"
+                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-black/30 hover:bg-white transition-all group relative"
                         >
-                          <p><span className="font-bold text-[#FE2C55] mr-2">【正文】</span></p>
+                          <p><span className="font-bold text-black mr-2">【视频正文】</span></p>
                           <p className="mt-1">{result.sections.body}</p>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Copy size={12} className="text-gray-400" />
@@ -541,9 +541,9 @@ export default function App() {
                         </div>
                         <div 
                           onClick={() => copyToClipboard(result.sections.outro, '结尾引导')}
-                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-[#FE2C55]/30 hover:bg-white transition-all group relative"
+                          className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-black/30 hover:bg-white transition-all group relative"
                         >
-                          <p><span className="font-bold text-[#FE2C55] mr-2">【结尾引导关注评论点赞】</span></p>
+                          <p><span className="font-bold text-black mr-2">【结尾引导】</span></p>
                           <p className="mt-1">{result.sections.outro}</p>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Copy size={12} className="text-gray-400" />
@@ -554,7 +554,7 @@ export default function App() {
                   </div>
 
                   <div className="space-y-3">
-                    <h3 className="text-xs font-bold text-[#FE2C55] uppercase tracking-wider">标签</h3>
+                    <h3 className="text-xs font-bold text-black uppercase tracking-wider">标签</h3>
                     <div className="flex flex-wrap gap-2">
                       {result.hashtags.map((h, i) => (
                         <span key={i} className="text-[#3a6ea5] text-xs font-medium cursor-pointer hover:underline" onClick={() => copyToClipboard(`#${h}`, `标签 #${h}`)}>#{h}</span>
@@ -564,10 +564,10 @@ export default function App() {
 
                   <button 
                     onClick={() => {
-                      const allText = `爆款标题建议：\n${result.titles.join('\n')}\n\n【视频开头钩子】：\n${result.sections.opening} ${result.sections.hook}\n\n【正文】：\n${result.sections.body}\n\n【结尾引导关注评论点赞】：\n${result.sections.outro}\n\n标签：${result.hashtags.map(h => '#' + h).join(' ')}`;
+                      const allText = `爆款标题建议：\n${result.titles.join('\n')}\n\n【视频开头】：\n${result.sections.opening} ${result.sections.hook}\n\n【视频正文】：\n${result.sections.body}\n\n【结尾引导】：\n${result.sections.outro}\n\n标签：${result.hashtags.map(h => '#' + h).join(' ')}`;
                       copyToClipboard(allText, '全部脚本');
                     }}
-                    className="w-full bg-[#fdf9f9] border border-red-100 text-[#FE2C55] py-3 rounded-xl text-sm font-bold hover:bg-[#FE2C55]/5 transition-all flex items-center justify-center gap-2"
+                    className="w-full bg-black/5 border border-gray-200 text-black py-3 rounded-xl text-sm font-bold hover:bg-black/10 transition-all flex items-center justify-center gap-2"
                   >
                     <Copy size={16} /> 复制全部脚本
                   </button>
