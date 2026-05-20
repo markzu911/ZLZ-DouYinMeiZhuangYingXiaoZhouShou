@@ -78,14 +78,23 @@ async function startServer() {
     if (!apiKey) return res.status(500).json({ error: "OPENAI_API_KEY missing" });
 
     try {
-      const { prompt, systemInstruction, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = req.body;
+      const { prompt, systemInstruction, image, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = req.body;
       const openai = new OpenAI({ apiKey });
+
+      const userContent: any[] = [{ type: 'text', text: prompt }];
+
+      if (image && typeof image === 'string') {
+        userContent.push({
+          type: 'image_url',
+          image_url: { url: image },
+        });
+      }
 
       const completion = await openai.chat.completions.create({
         model,
         messages: [
           systemInstruction ? { role: 'system', content: systemInstruction } : null,
-          { role: 'user', content: prompt },
+          { role: 'user', content: userContent },
         ].filter(Boolean) as any[],
       });
 

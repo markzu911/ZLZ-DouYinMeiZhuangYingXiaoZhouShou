@@ -11,14 +11,14 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
 1. opening (场景/痛点)：描述具体的痛点场景或吸引人的开场。
 2. hook (深度关联/情绪共鸣)：描述核心价值点或引发观众共鸣。
 注意：opening + hook 总字数必须在 50 字以内。
-3. body (正文)：详实丰富，自然融入【核心卖点标签】。如果是长视频，增加逻辑层级和情节起伏。
+3. body (正文)：详实丰富，自然融入【核心卖点标签】。正文部分必须根据文案逻辑分块、分点或分段落清晰列出（例如可以从多个角度、多个特性、使用场景等拆分成多个部分，如：“1. 核心优势一... 2. 独特设计... 3. 适用场景... 4. 真实体验... 等等”），条理分明。如果字数要求较多，请大量补充细节。
 4. outro (结尾引导)：包含明确的互动引导（如“快来评论区讨论”、“点赞关注不迷路”）。
 
 【风格与要求】：
 - 视角：第一人称“我”。
 - 语气：口语化、分享欲强。
-- 时长：${duration} (${duration === '15-30s' ? '40-80字' : duration === '30-60s' ? '120-250字' : '300-800字，必须包含详尽的步骤演示或多维度对比'})。
-- 强制要求：如果是 1-3min 档位，正文部分必须深度展开，增加细节密集度，确保信息量撑起时长。
+- 时长：${duration} (${duration === '15-30s' ? '对应约30秒视频，字数约120字' : duration === '30-60s' ? '对应约60秒视频，字数约300字' : '对应约3分钟长视频，字数约800字，必须包含详尽的展开或步骤演示'})。
+- 强制要求：如果是 1-3min 档位，正文部分必须深度展开，增加细节密集度，确保信息量撑起时长和字数要求。
 - 强制要求：opening 和 hook 的文字总数不得超过 50 字。
 
 核心主题：${mainTitle}
@@ -32,7 +32,7 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
   "hashtags": ["标签1", "标签2", ...]
 }`;
 
-  const prompt = `请基于以上指令，为产品“${mainTitle}”生成高质量的 JSON 脚本。${config.referenceImageUrl ? `参考图片链接：${config.referenceImageUrl}。` : ''}产品细节：${details.slice(0, 1500)}。`;
+  const prompt = `请基于以上指令，为“${mainTitle}”生成高质量的 JSON 脚本。${config.referenceImageBase64 ? '提示：用户上传了一张参考图，请结合图片中的视觉信息、包装或内容细节来辅助生成文案。' : ''}细节补充：${details.slice(0, 1500)}。`;
 
   try {
     let text = "";
@@ -42,7 +42,11 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
       const response = await fetch("/api/generate-gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt, systemInstruction }),
+        body: JSON.stringify({
+          prompt,
+          systemInstruction,
+          image: config.referenceImageBase64
+        }),
       });
       
       const data = await response.json();

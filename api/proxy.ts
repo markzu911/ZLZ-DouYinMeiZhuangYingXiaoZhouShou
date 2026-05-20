@@ -181,7 +181,7 @@ async function handleGenerateGpt(req: any, res: any) {
   }
 
   const body = normalizeBody(req.body);
-  const { prompt, systemInstruction, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = body;
+  const { prompt, systemInstruction, image, model = process.env.OPENAI_MODEL || 'gpt-4o-mini' } = body;
 
   if (!prompt) {
     return res.status(400).json({
@@ -193,11 +193,20 @@ async function handleGenerateGpt(req: any, res: any) {
   try {
     const openai = new OpenAI({ apiKey });
 
+    const userContent: any[] = [{ type: 'text', text: prompt }];
+
+    if (image && typeof image === 'string') {
+      userContent.push({
+        type: 'image_url',
+        image_url: { url: image },
+      });
+    }
+
     const completion = await openai.chat.completions.create({
       model,
       messages: [
         systemInstruction ? { role: 'system', content: systemInstruction } : null,
-        { role: 'user', content: prompt },
+        { role: 'user', content: userContent },
       ].filter(Boolean) as any[],
     });
 
