@@ -534,7 +534,7 @@ export default function App() {
                           className="bg-white/50 p-3 rounded-xl border border-gray-100 cursor-pointer hover:border-black/30 hover:bg-white transition-all group relative"
                         >
                           <p><span className="font-bold text-black mr-2">【视频正文】</span></p>
-                          <p className="mt-1">{result.sections.body}</p>
+                          <p className="mt-1 whitespace-pre-wrap">{result.sections.body}</p>
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Copy size={12} className="text-gray-400" />
                           </div>
