@@ -1,4 +1,5 @@
 import { CopywritingConfig, CopywritingResult } from "../types";
+import { readJsonResponse } from "../lib/fetch-utils";
 
 export const generateDouyinCopy = async (config: CopywritingConfig): Promise<CopywritingResult> => {
   const { mainTitle, highlights, details, contentStyle, duration, model } = config;
@@ -49,10 +50,7 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
         }),
       });
       
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "GPT 生成请求失败");
-      }
+      const data = await readJsonResponse(response);
       text = data.text || '';
     } else {
       // Use Gemini via backend proxy
@@ -93,10 +91,7 @@ export const generateDouyinCopy = async (config: CopywritingConfig): Promise<Cop
         }),
       });
       
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Gemini 生成请求失败");
-      }
+      const data = await readJsonResponse(response);
       text = data.text || '';
     }
     

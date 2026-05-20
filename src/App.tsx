@@ -26,6 +26,8 @@ import {
   X
 } from 'lucide-react';
 import { generateDouyinCopy } from './services/ai';
+import { compressImageToBase64 } from './lib/image-utils';
+import { readJsonResponse } from './lib/fetch-utils';
 import { CopywritingConfig, CopywritingResult } from './types';
 
 interface SaasContext {
@@ -111,7 +113,7 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, toolId })
       });
-      const json = await res.json();
+      const json = await readJsonResponse(res);
       if (json.success) {
         setSaas({
           userId,
@@ -136,14 +138,8 @@ export default function App() {
     try {
       const previewUrl = URL.createObjectURL(file);
       
-      // Convert to base64 for Gemini
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(file);
-      const base64 = await base64Promise;
+      // Convert and compress base64 for Gemini
+      const base64 = await compressImageToBase64(file);
 
       setConfig(prev => ({
         ...prev,
@@ -151,7 +147,7 @@ export default function App() {
         referenceImageBase64: base64
       }));
     } catch (err: any) {
-      setError(err.message || '图片读取失败');
+      setError(err.message || '图片读取及压缩失败');
     } finally {
       setUploading(false);
     }
@@ -177,7 +173,7 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: saas.userId, toolId: saas.toolId })
         });
-        const verifyJson = await verifyRes.json();
+        const verifyJson = await readJsonResponse(verifyRes);
         if (!verifyJson.success) {
           setError(verifyJson.message || '积分不足或校验失败');
           setLoading(false);
@@ -196,7 +192,7 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId: saas.userId, toolId: saas.toolId })
         });
-        const consumeJson = await consumeRes.json();
+        const consumeJson = await readJsonResponse(consumeRes);
         if (consumeJson.success) {
           setSaas(prev => ({ ...prev, integral: consumeJson.data.currentIntegral }));
         }
